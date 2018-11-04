@@ -15,9 +15,9 @@ books = [
 ]
 
 const defaultBook = {
-  borrowed = false;
-  authors = [];
-  description = "";
+  borrowed: false,
+  authors: [],
+  description: ""
 }
 
 const defaultAuthor = {}
@@ -34,7 +34,7 @@ const getBooks = () => {
 }
 
 const getBook = (id) => {
-  let ret = books.filter(({id:iid}) => iid === id)[0]
+  let ret = books.filter(({id:iid}) => iid == id)[0]
   if (ret === undefined) {
     throw "book not found"
   }
@@ -48,29 +48,31 @@ const assert$ = (error, yes) => {
 }
 
 const validateBook = (book) => {
+  console.log(JSON.stringify(book))
   assert$("book name must be a string", typeof(book.name) == 'string')
   assert$("book description must be a string", typeof(book.description == 'string'))
-  assert$("book borrowed status must be a boolean", typeof(book.borrowed) == 'boolean')
+  assert$("book borrowed status must be a boolean"+`${typeof(book.borrowed)}`, typeof(book.borrowed) == 'boolean')
   assert$("book name must be <= 30 characters", book.name.length <= 30);
 }
 
 const createBook = (book) => {
-  let book = Object.assign(defaultBook, book)
+  book = Object.assign(Object.assign({}, defaultBook), book)
   book.id = getNextId(books);
   validateBook(book);
   books.push(book);
 }
 
 const updateBook = (id, book) => {
+  book = Object.assign(Object.assign({}, defaultBook), book)
   validateBook(book);
-  assert$("book path id must match book body id", book.id === id)
-  let newbooks = books.filter(({id: iid}) => iid !== id)
+  assert$("book path id must match book body id", book.id == id)
+  let newbooks = books.filter(({id: iid}) => iid != id)
   newbooks.push(book);
   books = newbooks;
 }
 
 const deleteBook = (id) => {
-  let newbooks = books.filter(({id: iid}) => iid !== id)
+  let newbooks = books.filter(({id: iid}) => iid != id)
   books = newbooks;
 }
 
@@ -82,7 +84,7 @@ const getAuthors = (bookId) => {
 
 const getAuthor = (bookId, id) => {
   const book = getBook(bookId);
-  let ret = book.authors.filter(({id:iid}) => iid === id)[0]
+  let ret = book.authors.filter(({id:iid}) => iid == id)[0]
   if (ret === undefined) {
     throw "author not found"
   }
@@ -91,13 +93,13 @@ const getAuthor = (bookId, id) => {
 
 const validateAuthor = (author) => {
   assert$("author first name must be a string", typeof(book.first) == 'string')
-  assert$("author last name must be a string", typeof(book.last) == 'string'))
+  assert$("author last name must be a string", typeof(book.last) == 'string')
 }
 
 const createAuthor = (bookId, author) => {
   const book = getBook(bookId);
 
-  let author = Object.assign(defaultAuthor, author);
+  author = Object.assign(Object.assign({}, defaultAuthor), author);
   author.id = getNextId(book.authors);
   validateAuthor(author);
   book.authors.push(author);
@@ -109,9 +111,10 @@ const createAuthor = (bookId, author) => {
 const updateAuthor = (bookId, id, author) => {
   const book = getBook(bookId);
 
+  author = Object.assign(Object.assign({}, defaultAuthor), author);
   validateAuthor(author);
-  assert$("author path id must match author body id", author.id === id)
-  let newauthors = book.authors.filter(({id: iid}) => iid !== id)
+  assert$("author path id must match author body id", author.id == id)
+  let newauthors = book.authors.filter(({id: iid}) => iid != id)
   newauthors.push(author);
   book.authors = newauthors;
   updateBook(bookId, book);
@@ -120,8 +123,21 @@ const updateAuthor = (bookId, id, author) => {
 const deleteAuthor = (bookId, id) => {
   const book = getBook(bookId);
 
-  let newauthors = book.authors.filter(({id: iid}) => iid !== id)
+  let newauthors = book.authors.filter(({id: iid}) => iid != id)
   book.authors = newauthors;
 
   updateBook(bookId, book);
+}
+
+module.exports = {
+  getBooks,
+  getBook,
+  createBook,
+  updateBook,
+  deleteBook,
+  getAuthors,
+  getAuthor,
+  createAuthor,
+  updateAuthor,
+  deleteAuthor
 }
